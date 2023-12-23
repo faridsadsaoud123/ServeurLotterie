@@ -9,8 +9,8 @@ public class Billet implements Serializable {
         this.numeroSerie = generateNumeroSerie();
     }
     public static String generateNumeroSerie() {
-        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        int SERIE_LENGTH = 20;
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        final int SERIE_LENGTH = 20;
         SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder(SERIE_LENGTH);
 
