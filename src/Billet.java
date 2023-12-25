@@ -5,8 +5,10 @@ import java.util.List;
 public class Billet implements Serializable {
     private String numeroSerie;
     private List<Integer> numerosChoisis;
-    public Billet(){
+    private int category;
+    public Billet(int category){
         this.numeroSerie = generateNumeroSerie();
+        this.category = category;
     }
     public static String generateNumeroSerie() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
