@@ -32,6 +32,7 @@ public class Server {
             public void run() {
                 loterieEnCours = false;
                 tirerNumerosGagnants();
+                //TODO: Strop all threads
             }
         }, duree * 1000);
     }
@@ -73,11 +74,13 @@ public class Server {
             if(category == 1){
                 for(int i = 0; i < number; i++){
                     Billet billet = new Billet(1, k, null);
+                    //TODO: serialize billet
                     listBillet.add(billet);
                 }
             }else{
                 for(int i = 0; i < number; i++){
                     Billet billet = new Billet(2, k, (ArrayList<Integer>) nombresSouhaite.get(i));
+                    //TODO: serialize billet
                     listBillet.add(billet);
                 }
             }
