@@ -1,5 +1,6 @@
 import AutreEvent.*;
 
+import java.io.*;
 import java.util.*;
 
 public class Server {
@@ -70,16 +71,45 @@ public class Server {
             this.nombresSouhaite = nombresSouhaite;
             listBillet = new ArrayList<>();
         }
+        public void serialiser(Billet billet) throws IOException {
+            FileOutputStream fos = new FileOutputStream("Billets");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(billet);
+        }
+        public List<Billet> deserialiser(){
+            try{
+                FileInputStream fis = new FileInputStream("Billet");
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                return  (List<Billet>)ois.readObject();
+            }
+            catch(IOException io){
+                System.out.println("Erreur");
+            }catch (ClassNotFoundException cnf){
+                System.out.println("Error");
+            }
+        }
         public void run(){
             if(category == 1){
                 for(int i = 0; i < number; i++){
                     Billet billet = new Billet(1, k, null);
+                    try{
+                        serialiser(billet);
+                    }
+                    catch(IOException io){
+                        System.out.println("Error");
+                    }
                     //TODO: serialize billet
                     listBillet.add(billet);
                 }
             }else{
                 for(int i = 0; i < number; i++){
                     Billet billet = new Billet(2, k, (ArrayList<Integer>) nombresSouhaite.get(i));
+                    try{
+                        serialiser(billet);
+                    }
+                    catch(IOException io){
+                        System.out.println("Error");
+                    }
                     //TODO: serialize billet
                     listBillet.add(billet);
                 }
