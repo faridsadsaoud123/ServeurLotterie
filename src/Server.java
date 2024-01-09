@@ -87,6 +87,7 @@ public class Server {
             }catch (ClassNotFoundException cnf){
                 System.out.println("Error");
             }
+            return null;
         }
         public void run(){
             if(category == 1){
