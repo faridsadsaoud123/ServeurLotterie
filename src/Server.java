@@ -77,10 +77,18 @@ public class Server {
             oos.writeObject(billet);
         }
         public List<Billet> deserialiser(){
+            List<Billet> listBillets = new ArrayList<>();
             try{
                 FileInputStream fis = new FileInputStream("Billet");
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                return  (List<Billet>)ois.readObject();
+                while (true){
+                    try{
+                        Billet billet = (Billet)ois.readObject();
+                        listBillets.add(billet);
+                    }catch(EOFException eof){
+                        break;
+                    }
+                }
             }
             catch(IOException io){
                 System.out.println("Erreur");

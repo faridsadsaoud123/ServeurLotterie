@@ -9,7 +9,7 @@ public class Billet implements Serializable {
     private ArrayList<Integer> numerosChoisis;
     private int k;
     private int category;
-    public Billet(int category, int k, ArrayList<Integer> list){
+    Billet(int category, int k, ArrayList<Integer> list){
         this.numeroSerie = generateNumeroSerie();
         this.category = category;
         this.numerosChoisis = new ArrayList<>();
