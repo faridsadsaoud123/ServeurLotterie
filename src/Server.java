@@ -1,17 +1,15 @@
 import AutreEvent.*;
-
 import java.io.*;
 import java.util.*;
-
 public class Server {
     private int n, k, t, duree;
-    private ArrayList<Integer> listNumbers;
+    private ArrayList<Integer>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          listNumbers;
     private boolean loterieEnCours;
     private Timer timer;
     private AutreEventNotifieur notifieur = new AutreEventNotifieur();
     private ArrayList<Integer> listeNumGagnants;
     private Random random;
-
+    private  Vendre vendre;
     public Server(int n, int k, int t, int duree){
         this.n = n;
         this.k = k;
@@ -24,7 +22,6 @@ public class Server {
             listNumbers.add(random.nextInt(99));
         }
     }
-
     public void demarrerLoterie() {
         loterieEnCours = true;
         timer = new Timer();
@@ -42,10 +39,23 @@ public class Server {
         for(int i = 0; i < k; i++){
             listeNumGagnants.add(listNumbers.get(random.nextInt(99)));
         }
-        notifieur.diffuserAutreEvent(new AutreEvent(this, listeNumGagnants));
+        ArrayList<Billet> billets  = (ArrayList<Billet>) vendre.deserialiser();
+        ArrayList<Billet> billetsGagnants = new ArrayList<Billet>();
+        for(Billet billet: billets){
+            int count =0;
+            for (int i=0 ;i<billet.getNumerosChoisis().toArray().length;i++){
+                ArrayList<Integer> numChoisis = billet.getNumerosChoisis();
+                if(listeNumGagnants.contains(numChoisis.get(i))){
+                    count++;
+                }
+            }
+                if (count>=t){
+                    billetsGagnants.add(billet);
+                }
+        }
+        notifieur.diffuserAutreEvent(new AutreEvent(this, billetsGagnants));
         timer.cancel();
     }
-
     public void addAutreEventListener(AutreEventListener listener) {
         notifieur.addAutreEventListener(listener);
     }
@@ -107,7 +117,7 @@ public class Server {
                     catch(IOException io){
                         System.out.println("Error");
                     }
-                    //TODO: serialize billet
+
                     listBillet.add(billet);
                 }
             }else{
@@ -119,7 +129,6 @@ public class Server {
                     catch(IOException io){
                         System.out.println("Error");
                     }
-                    //TODO: serialize billet
                     listBillet.add(billet);
                 }
             }

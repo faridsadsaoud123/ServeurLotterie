@@ -8,8 +8,12 @@ public class Joueur implements AutreEventListener {
     @Override
     public void actionADeclancher(AutreEvent event) {
         if (event.getSource() instanceof Server && event.getDonnee() instanceof ArrayList<?>){
-            ArrayList<Integer> listeNumGagnant = (ArrayList<Integer>)event.getDonnee();
-
+            ArrayList<Billet> listeBilletGagnant = (ArrayList<Billet>)event.getDonnee();
+            for (Billet billet:listeBilletGagnant){
+                if (billetAchete.contains(billet)){
+                    System.out.println("Je suis Gagnant");
+                }
+            }
         }
     }
     public void acheterBillet(Server server, int number, int category, ArrayList<ArrayList<Integer>> nombresSouhaite){
