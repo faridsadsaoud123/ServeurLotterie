@@ -3,13 +3,13 @@ import java.io.*;
 import java.util.*;
 public class Server {
     private int n, k, t, duree;
-    private ArrayList<Integer>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          listNumbers;
+    private ArrayList<Integer> listNumbers;
     private boolean loterieEnCours;
     private Timer timer;
     private AutreEventNotifieur notifieur = new AutreEventNotifieur();
     private ArrayList<Integer> listeNumGagnants;
     private Random random;
-    private  Vendre vendre;
+    private ArrayList<Billet> billetVendu;
     public Server(int n, int k, int t, int duree){
         this.n = n;
         this.k = k;
@@ -17,6 +17,7 @@ public class Server {
         this.duree = duree;
         this.listNumbers = new ArrayList<>();
         this.listeNumGagnants = new ArrayList<>();
+        this.billetVendu = new ArrayList<>();
         random  = new Random();
         for(int i = 0; i < n; i++){
             listNumbers.add(random.nextInt(99));
@@ -37,9 +38,9 @@ public class Server {
 
     private void tirerNumerosGagnants() {
         for(int i = 0; i < k; i++){
-            listeNumGagnants.add(listNumbers.get(random.nextInt(99)));
+            listeNumGagnants.add(listNumbers.get(random.nextInt(90)));
         }
-        ArrayList<Billet> billets  = (ArrayList<Billet>) vendre.deserialiser();
+        ArrayList<Billet> billets  = (ArrayList<Billet>) deserialiser();
         ArrayList<Billet> billetsGagnants = new ArrayList<Billet>();
         for(Billet billet: billets){
             int count =0;
@@ -63,9 +64,35 @@ public class Server {
         notifieur.removeAutreEventListener(listener);
     }
 
+    public List<Billet> deserialiser() {
+        List<Billet> listBillets = null;
+        try (FileInputStream fis = new FileInputStream("Billets");
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+//            while (true) {
+//                try {
+//                    Billet billet = (Billet) ois.readObject();
+//                    listBillets.add(billet);
+//                } catch (EOFException eof) {
+//                    break;
+//                }
+//            }
+            listBillets = (ArrayList<Billet>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println(listBillets.size());
+        return listBillets;
+    }
+
     public void vendreBillet(Joueur joueur, int number, int category, ArrayList<ArrayList<Integer>> numbresSouhaite){
         Thread acheter = new Thread(new Vendre(joueur, number, category, numbresSouhaite));
         acheter.start();
+    }
+    public void serialiser(ArrayList<Billet> list) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream("Billets");
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(list);
+        }
     }
 
     class Vendre implements Runnable{
@@ -79,40 +106,18 @@ public class Server {
             this.category = category;
             this.joueur = joueur;
             this.nombresSouhaite = nombresSouhaite;
-            listBillet = new ArrayList<>();
+            this.listBillet = new ArrayList<>();
         }
-        public void serialiser(Billet billet) throws IOException {
-            FileOutputStream fos = new FileOutputStream("Billets");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(billet);
-        }
-        public List<Billet> deserialiser(){
-            List<Billet> listBillets = new ArrayList<>();
-            try{
-                FileInputStream fis = new FileInputStream("Billet");
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                while (true){
-                    try{
-                        Billet billet = (Billet)ois.readObject();
-                        listBillets.add(billet);
-                    }catch(EOFException eof){
-                        break;
-                    }
-                }
-            }
-            catch(IOException io){
-                System.out.println("Erreur");
-            }catch (ClassNotFoundException cnf){
-                System.out.println("Error");
-            }
-            return null;
-        }
+
         public void run(){
             if(category == 1){
                 for(int i = 0; i < number; i++){
                     Billet billet = new Billet(1, k, null);
                     try{
-                        serialiser(billet);
+                        synchronized (billetVendu){
+                            billetVendu.add(billet);
+                            serialiser(billetVendu);
+                        }
                     }
                     catch(IOException io){
                         System.out.println("Error");
@@ -124,7 +129,10 @@ public class Server {
                 for(int i = 0; i < number; i++){
                     Billet billet = new Billet(2, k, (ArrayList<Integer>) nombresSouhaite.get(i));
                     try{
-                        serialiser(billet);
+                        synchronized (billetVendu){
+                            billetVendu.add(billet);
+                            serialiser(billetVendu);
+                        }
                     }
                     catch(IOException io){
                         System.out.println("Error");
