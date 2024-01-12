@@ -43,6 +43,7 @@ public class Server {
         }
         ArrayList<Billet> billets  = (ArrayList<Billet>) deserialiser();
         ArrayList<Billet> billetsGagnants = new ArrayList<Billet>();
+        System.out.println("les billets gagnats:");
         for(Billet billet: billets){
             count =0;
             for (int i=0 ;i<billet.getNumerosChoisis().toArray().length;i++){
@@ -53,46 +54,32 @@ public class Server {
             }
                 if (count>=t) {
                     billet.setNbNgagant(count);
+                    System.out.print(billet.toString());
                     billetsGagnants.add(billet);
                 }
         }
         HashMap<Integer, Integer> gagnants = new HashMap<Integer, Integer>();
-        for (Billet billet : billetsGagnants) {
-            int num = billet.getJoueur();
-            int t = billet.getNbNgagant();
-            if (gagnants.containsKey(num)) {
-                gagnants.put(num, gagnants.get(num) + t);
-            } else {
-                gagnants.put(num, t);
+        if(billetsGagnants.isEmpty()){
+            System.out.println("pas de gagnants!!");
+        }else{
+            for (Billet billet : billetsGagnants) {
+                int num = billet.getJoueur();
+                int t = billet.getNbNgagant();
+                if (gagnants.containsKey(num)) {
+                    gagnants.put(num, gagnants.get(num) + t);
+                } else {
+                    gagnants.put(num, t);
+                }
             }
+
+            for (Map.Entry<Integer, Integer> entry : gagnants.entrySet()) {
+                entry.setValue(entry.getValue() * 1000);
+            }
+
         }
 
-        List<Map.Entry<Integer, Integer>> list = new LinkedList<>(gagnants.entrySet());
-
-        Collections.sort(list, Comparator.comparing(Map.Entry::getValue));
-
-        Map<Integer, Integer> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<Integer, Integer> entry : list) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        for (Map.Entry<Integer, Integer> entry : gagnants.entrySet()) {
-            System.out.println("num: " + entry.getKey() + ", sum of t: " + entry.getValue());
-        }
         notifieur.diffuserAutreEvent(new AutreEvent(this, gagnants));
         timer.cancel();
-    }
-    class WinnerInfo{
-        int numJoueur;
-        int prix = 0;
-        int t;
-        WinnerInfo(int numJoueur, int t){
-            this.numJoueur = numJoueur;
-            this.t = t;
-        }
-        public void setPrix(int prix){
-            this.prix = prix;
-        }
     }
 
     public void addAutreEventListener(AutreEventListener listener) {
@@ -103,14 +90,14 @@ public class Server {
     }
 
     public List<Billet> deserialiser() {
-        List<Billet> listBillets = null;
+        List<Billet> listBillets = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream("Billets");
              ObjectInputStream ois = new ObjectInputStream(fis)) {
-            listBillets = (ArrayList<Billet>) ois.readObject();
+            List<Billet> billets = (List<Billet>) ois.readObject();
+            listBillets.addAll(billets);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        System.out.println(listBillets.size());
         return listBillets;
     }
 
@@ -145,8 +132,10 @@ public class Server {
                     Billet billet = new Billet(joueur.getNumJoueur(), 1, k, null);
                     try{
                         synchronized (billetVendu){
-                            billetVendu.add(billet);
-                            serialiser(billetVendu);
+                            if(loterieEnCours){
+                                billetVendu.add(billet);
+                                serialiser(billetVendu);
+                            }
                         }
                     }
                     catch(IOException io){
@@ -160,8 +149,10 @@ public class Server {
                     Billet billet = new Billet(joueur.getNumJoueur(), 2, k, (ArrayList<Integer>) nombresSouhaite.get(i));
                     try{
                         synchronized (billetVendu){
-                            billetVendu.add(billet);
-                            serialiser(billetVendu);
+                            if(loterieEnCours){
+                                billetVendu.add(billet);
+                                serialiser(billetVendu);
+                            }
                         }
                     }
                     catch(IOException io){
@@ -170,7 +161,9 @@ public class Server {
                     listBillet.add(billet);
                 }
             }
-            joueur.billetAchete = listBillet;
+            if(loterieEnCours){
+                joueur.billetAchete = listBillet;
+            }
         }
     }
 

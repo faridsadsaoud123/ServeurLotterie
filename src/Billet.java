@@ -24,7 +24,7 @@ public class Billet implements Serializable {
         }
     }
     public String toString() {
-        return "Numero de serie: "+this.numeroSerie;
+        return "Numero de serie: "+this.numeroSerie + "\n";
     }
     public void setNbNgagant(int i){
         this.nbNgagant = i;

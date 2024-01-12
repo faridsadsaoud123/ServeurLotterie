@@ -1,6 +1,8 @@
 import AutreEvent.AutreEvent;
 import AutreEvent.AutreEventListener;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Joueur implements AutreEventListener {
@@ -13,14 +15,14 @@ public class Joueur implements AutreEventListener {
 
     @Override
     public void actionADeclancher(AutreEvent event) {
-//        if (event.getSource() instanceof Server && event.getDonnee() instanceof ArrayList<?>){
-//            ArrayList<Billet> listeBilletGagnant = (ArrayList<Billet>)event.getDonnee();
-//            for (Billet billet:listeBilletGagnant){
-//                if (billetAchete.contains(billet)){
-//                    System.out.println("Je suis Gagnant");
-//                }
-//            }
-//        }
+        if (event.getSource() instanceof Server && event.getDonnee() instanceof HashMap<?,?>){
+            HashMap<Integer, Integer> listeJoueursGagnants = (HashMap<Integer, Integer>)event.getDonnee();
+            for (Map.Entry<Integer, Integer> entry : listeJoueursGagnants.entrySet()) {
+                if(entry.getKey() == numJoueur){
+                    System.out.println(numJoueur+" j'ai gagné: " + entry.getValue());
+                }
+            }
+        }
     }
     public void acheterBillet(Server server, int number, int category, ArrayList<ArrayList<Integer>> nombresSouhaite){
         server.vendreBillet(this, number, category, nombresSouhaite);
