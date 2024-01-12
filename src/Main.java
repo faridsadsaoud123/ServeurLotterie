@@ -15,7 +15,7 @@ public class Main {
         server.addAutreEventListener(joueur4);
 
         joueur1.acheterBillet(server, 100, 1, null);
-        joueur2.acheterBillet(server, 4, 1, null);
+        joueur2.acheterBillet(server, 80, 1, null);
 
         ArrayList<ArrayList<Integer>> list = new ArrayList<>();
         list.add(new ArrayList<>(Arrays.asList(22, 32, 55, 99, 0)));

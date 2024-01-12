@@ -1,20 +1,26 @@
 import AutreEvent.AutreEvent;
 import AutreEvent.AutreEventListener;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Joueur implements AutreEventListener {
+    int numJoueur;
     ArrayList<Billet> billetAchete;
+
+    public Joueur(){
+        this.numJoueur = new Random().nextInt(9999);
+    }
 
     @Override
     public void actionADeclancher(AutreEvent event) {
-        if (event.getSource() instanceof Server && event.getDonnee() instanceof ArrayList<?>){
-            ArrayList<Billet> listeBilletGagnant = (ArrayList<Billet>)event.getDonnee();
-            for (Billet billet:listeBilletGagnant){
-                if (billetAchete.contains(billet)){
-                    System.out.println("Je suis Gagnant");
-                }
-            }
-        }
+//        if (event.getSource() instanceof Server && event.getDonnee() instanceof ArrayList<?>){
+//            ArrayList<Billet> listeBilletGagnant = (ArrayList<Billet>)event.getDonnee();
+//            for (Billet billet:listeBilletGagnant){
+//                if (billetAchete.contains(billet)){
+//                    System.out.println("Je suis Gagnant");
+//                }
+//            }
+//        }
     }
     public void acheterBillet(Server server, int number, int category, ArrayList<ArrayList<Integer>> nombresSouhaite){
         server.vendreBillet(this, number, category, nombresSouhaite);
@@ -31,4 +37,7 @@ public class Joueur implements AutreEventListener {
         }
     }
 
+    public int getNumJoueur() {
+        return numJoueur;
+    }
 }

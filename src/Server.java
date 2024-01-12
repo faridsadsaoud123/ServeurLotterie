@@ -52,15 +52,49 @@ public class Server {
                 }
             }
                 if (count>=t) {
+                    billet.setNbNgagant(count);
                     billetsGagnants.add(billet);
                 }
         }
-        for (Billet billet : billetsGagnants){
-            System.out.println(billet.toString());
+        HashMap<Integer, Integer> gagnants = new HashMap<Integer, Integer>();
+        for (Billet billet : billetsGagnants) {
+            int num = billet.getJoueur();
+            int t = billet.getNbNgagant();
+            if (gagnants.containsKey(num)) {
+                gagnants.put(num, gagnants.get(num) + t);
+            } else {
+                gagnants.put(num, t);
+            }
         }
-        notifieur.diffuserAutreEvent(new AutreEvent(this, billetsGagnants));
+
+        List<Map.Entry<Integer, Integer>> list = new LinkedList<>(gagnants.entrySet());
+
+        Collections.sort(list, Comparator.comparing(Map.Entry::getValue));
+
+        Map<Integer, Integer> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Integer> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Integer> entry : gagnants.entrySet()) {
+            System.out.println("num: " + entry.getKey() + ", sum of t: " + entry.getValue());
+        }
+        notifieur.diffuserAutreEvent(new AutreEvent(this, gagnants));
         timer.cancel();
     }
+    class WinnerInfo{
+        int numJoueur;
+        int prix = 0;
+        int t;
+        WinnerInfo(int numJoueur, int t){
+            this.numJoueur = numJoueur;
+            this.t = t;
+        }
+        public void setPrix(int prix){
+            this.prix = prix;
+        }
+    }
+
     public void addAutreEventListener(AutreEventListener listener) {
         notifieur.addAutreEventListener(listener);
     }
@@ -72,14 +106,6 @@ public class Server {
         List<Billet> listBillets = null;
         try (FileInputStream fis = new FileInputStream("Billets");
              ObjectInputStream ois = new ObjectInputStream(fis)) {
-//            while (true) {
-//                try {
-//                    Billet billet = (Billet) ois.readObject();
-//                    listBillets.add(billet);
-//                } catch (EOFException eof) {
-//                    break;
-//                }
-//            }
             listBillets = (ArrayList<Billet>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -116,7 +142,7 @@ public class Server {
         public void run(){
             if(category == 1){
                 for(int i = 0; i < number; i++){
-                    Billet billet = new Billet(1, k, null);
+                    Billet billet = new Billet(joueur.getNumJoueur(), 1, k, null);
                     try{
                         synchronized (billetVendu){
                             billetVendu.add(billet);
@@ -131,7 +157,7 @@ public class Server {
                 }
             }else{
                 for(int i = 0; i < number; i++){
-                    Billet billet = new Billet(2, k, (ArrayList<Integer>) nombresSouhaite.get(i));
+                    Billet billet = new Billet(joueur.getNumJoueur(), 2, k, (ArrayList<Integer>) nombresSouhaite.get(i));
                     try{
                         synchronized (billetVendu){
                             billetVendu.add(billet);
