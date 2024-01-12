@@ -20,6 +20,10 @@ public class Billet implements Serializable {
             genererBillet2(list);
         }
     }
+    public String toString() {
+        return "Numero de serie: "+this.numeroSerie;
+    }
+
     public static String generateNumeroSerie() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         final int SERIE_LENGTH = 20;

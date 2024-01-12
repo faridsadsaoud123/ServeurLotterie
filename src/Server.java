@@ -37,22 +37,26 @@ public class Server {
     }
 
     private void tirerNumerosGagnants() {
+        int count =0;
         for(int i = 0; i < k; i++){
             listeNumGagnants.add(listNumbers.get(random.nextInt(90)));
         }
         ArrayList<Billet> billets  = (ArrayList<Billet>) deserialiser();
         ArrayList<Billet> billetsGagnants = new ArrayList<Billet>();
         for(Billet billet: billets){
-            int count =0;
+            count =0;
             for (int i=0 ;i<billet.getNumerosChoisis().toArray().length;i++){
                 ArrayList<Integer> numChoisis = billet.getNumerosChoisis();
                 if(listeNumGagnants.contains(numChoisis.get(i))){
                     count++;
                 }
             }
-                if (count>=t){
+                if (count>=t) {
                     billetsGagnants.add(billet);
                 }
+        }
+        for (Billet billet : billetsGagnants){
+            System.out.println(billet.toString());
         }
         notifieur.diffuserAutreEvent(new AutreEvent(this, billetsGagnants));
         timer.cancel();
